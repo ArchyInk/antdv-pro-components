@@ -9,10 +9,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^6.1.0",
+    "ant-design-vue": "^3.2.10",
+    "arhooks-vue": "^1.0.6",
+    "lodash": "^4.17.21",
     "vue": "^3.2.37"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.18.6",
+    "@types/lodash": "^4.14.182",
     "@vitejs/plugin-vue": "^3.0.0",
+    "@vitejs/plugin-vue-jsx": "^2.0.0",
+    "@vue/babel-plugin-jsx": "^1.1.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.0",
     "vue-tsc": "^0.38.4"
