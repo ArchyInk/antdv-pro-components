@@ -13,7 +13,9 @@ specifiers:
   typescript: ^4.6.4
   vite: ^3.0.0
   vue: ^3.2.37
+  vue-fullscreen: ^3.1.1
   vue-tsc: ^0.38.4
+  vuedraggable: ^2.24.3
 
 dependencies:
   '@ant-design/icons-vue': 6.1.0_vue@3.2.37
@@ -21,6 +23,8 @@ dependencies:
   arhooks-vue: 1.0.6
   lodash: 4.17.21
   vue: 3.2.37
+  vue-fullscreen: 3.1.1_vue@3.2.37
+  vuedraggable: 2.24.3
 
 devDependencies:
   '@babel/preset-env': 7.18.6
@@ -2117,6 +2121,11 @@ packages:
     resolution: {integrity: sha1-mR7GnSluAxN0fVm9/St0XDX4go0=}
     dev: true
 
+  /screenfull/5.2.0:
+    resolution: {integrity: sha1-ZTPVJNMGIfwSg7lpIUbz8TqT0bo=}
+    engines: {node: '>=0.10.0'}
+    dev: false
+
   /scroll-into-view-if-needed/2.2.29:
     resolution: {integrity: sha512-hxpAR6AN+Gh53AdAimHM6C8oTN1ppwVZITihix+WqalywBeFcQ6LdQP5ABNl26nX8GTEL7VT+b8lKpdqq65wXg==}
     dependencies:
@@ -2135,6 +2144,10 @@ packages:
 
   /shallow-equal/1.2.1:
     resolution: {integrity: sha1-TBar+lYEOqINBQMk76aJQLDaedo=}
+    dev: false
+
+  /sortablejs/1.10.2:
+    resolution: {integrity: sha1-bkA2TZE/mLhaFPZnj5K1wSIfUpA=}
     dev: false
 
   /source-map-js/1.0.2:
@@ -2306,6 +2319,15 @@ packages:
       - stylus
     dev: false
 
+  /vue-fullscreen/3.1.1_vue@3.2.37:
+    resolution: {integrity: sha1-OFCX4LQ/RgTe2ZrbDOsiXeo+AyY=}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      screenfull: 5.2.0
+      vue: 3.2.37
+    dev: false
+
   /vue-tsc/0.38.5_typescript@4.7.4:
     resolution: {integrity: sha512-AFlqvwpENOTTJxS1Gl1uG0ZVsvtGCbgv9d0i4fXk5Pnao/ETVwWewPEsj+4cPlwa5htO9WhK6qfWwoqcCqg0yQ==}
     hasBin: true
@@ -2334,6 +2356,12 @@ packages:
       '@vue/runtime-dom': 3.2.37
       '@vue/server-renderer': 3.2.37_vue@3.2.37
       '@vue/shared': 3.2.37
+    dev: false
+
+  /vuedraggable/2.24.3:
+    resolution: {integrity: sha1-Q8k4SbdGokzlA+Ej1bJZxwG6DRk=}
+    dependencies:
+      sortablejs: 1.10.2
     dev: false
 
   /warning/4.0.3:
