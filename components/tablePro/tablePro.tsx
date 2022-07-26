@@ -182,19 +182,19 @@ export default defineComponent({
 
       return (
         fullscreenState.value ? null :
-          (<div class="sgd-table-title" style={titleStyle.value}>
+          (<div class="table-pro__title" style={titleStyle.value}>
             <div>{slots.title?.(currentPageData)}</div>
-            {showTools.value ? <div class="sgd-table-title-btns">
+            {showTools.value ? <div class="table-pro__title__tools">
               <div>
                 <ReloadOutlined onClick={() => { refresh() }} />
               </div>
               <div>
-                <Dropdown placement="bottomCenter" trigger={['click']} v-slots={{ overlay: () => renderTableSizeChangeOverLay() }}>
+                <Dropdown placement="bottom" trigger={['click']} v-slots={{ overlay: () => renderTableSizeChangeOverLay() }}>
                   <ColumnHeightOutlined />
                 </Dropdown>
               </div>
               <div>
-                <Dropdown placement="bottomCenter" trigger={['click']} v-slots={{ overlay: () => renderTableColumnsSetttingOverLay() }}>
+                <Dropdown placement="bottom" trigger={['click']} v-slots={{ overlay: () => renderTableColumnsSetttingOverLay() }}>
                   <SettingOutlined />
                 </Dropdown>
               </div>
@@ -274,7 +274,7 @@ export default defineComponent({
         })
       }
 
-      local.dataSource = []
+      // local.dataSource = []
       emit('refresh')
       loadData()
     }
@@ -300,11 +300,13 @@ export default defineComponent({
       const _props = Object.assign({}, props, local)
       const renderTable = (<Table {..._props} onChange={loadData} v-slots={{
         ...slots,
-        title: (slots.title || showTools.value) ? (currentPageData: PanelRender<DefaultRecordType>) => renderTitle(currentPageData) : undefined,
+        title: (slots.title || showTools.value) && ((currentPageData: PanelRender<DefaultRecordType>) => renderTitle(currentPageData)),
       }} />
       )
 
-      return <div>{renderTable}</div>
+      return <fullscreen ref="fullscreenEle" v-model={fullscreenState.value} fullscreenClass="table-pro--fullscreen">
+        {renderTable}
+      </fullscreen>
     }
   }
 })
