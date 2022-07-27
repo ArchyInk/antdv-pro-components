@@ -15,7 +15,7 @@
     "lodash": "^4.17.21",
     "vue": "^3.2.37",
     "vue-fullscreen": "^3.1.1",
-    "vuedraggable": "^2.24.3"
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.18.6",

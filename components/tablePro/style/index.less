@@ -7,16 +7,19 @@
 @import 'ant-design-vue/es/dropdown/style/index.css';
 @import 'ant-design-vue/es/checkbox/style/index.css';
 @import 'ant-design-vue/es/tooltip/style/index.css';
+@import 'ant-design-vue/es/button/style/index.css';
 
-.table-pro--fullscreen {
-  background: #fff;
-}
+
 
 .ant-table-title {
   padding: 4px;
 }
 
 .table-pro {
+  &--fullscreen {
+    background: #fff;
+  }
+
   &__title {
     display: flex;
     justify-content: space-between;
@@ -30,6 +33,30 @@
       div {
         margin: auto 0.25rem;
         cursor: pointer;
+      }
+    }
+  }
+
+  &__columns {
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+
+    &__header {
+      border-bottom: 1px solid #d9d9d9;
+      padding-bottom: 4px;
+    }
+
+    &__item {
+      display: flex;
+      user-select: none;
+
+      &__icon {
+        margin-right: 4px;
+      }
+
+      &--disabled {
+        cursor: not-allowed;
       }
     }
   }

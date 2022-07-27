@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-15 15:02:07
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-15 16:02:06
+ * @LastEditTime: 2022-07-27 09:13:25
  * @FilePath: \ant-design-vue-pro\preview\main.ts
  * @description: 
  */
@@ -14,6 +14,5 @@ import pro from '../components'
 
 const app = createApp(App)
 
-app.mount('#app')
-
 app.use(pro)
+app.mount('#app')
