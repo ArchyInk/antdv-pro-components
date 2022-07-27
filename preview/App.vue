@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-15 15:02:07
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-27 15:47:10
+ * @LastEditTime: 2022-07-27 16:24:24
  * @FilePath: \ant-design-vue-pro\preview\App.vue
  * @description: 
 -->
@@ -43,6 +43,9 @@ const getData = (p: any) => {
     <formPro>
       <div>123</div>
       <div>345</div>
+      <div>678</div>
+      <div>910</div>
+      <div>123</div>
     </formPro>
   </ConfigProvider>
 </template>
