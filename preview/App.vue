@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-15 15:02:07
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-27 16:24:24
+ * @LastEditTime: 2022-07-27 22:27:52
  * @FilePath: \ant-design-vue-pro\preview\App.vue
  * @description: 
 -->
@@ -11,6 +11,7 @@ import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import tablePro, { ColumnsProType } from '../components/tablePro/tablePro';
 import formPro from '../components/formPro/formPro'
 import { ConfigProvider } from 'ant-design-vue';
+import testRow from './com/test-form-row.vue'
 import { ref } from 'vue'
 const columns = ref<ColumnsProType>([
   { title: '姓名1', key: '1', dataIndex: 'name' },
@@ -23,7 +24,7 @@ const columns = ref<ColumnsProType>([
   { title: '姓名8', key: '8', dataIndex: 'name' },
   {
     title: '年龄', key: 'age', children: [
-      { title: '姓名9', dataIndex: 'name', hide: true, },
+      { title: '姓名9', dataIndex: 'name', },
       { title: '姓名10', dataIndex: 'name' },
     ],
   },
@@ -39,13 +40,23 @@ const getData = (p: any) => {
 
 <template>
   <ConfigProvider :locale="zhCN">
-    <!-- <tablePro :data="getData" :columns="columns"></tablePro> -->
+    <!-- <tablePro :data="getData" :columns="columns"></tablePro>  -->
     <formPro>
-      <div>123</div>
-      <div>345</div>
-      <div>678</div>
-      <div>910</div>
-      <div>123</div>
+      <a-form-item label="输入框">
+        <a-input></a-input>
+      </a-form-item>
+      <a-form-item label="选择框">
+        <a-select></a-select>
+      </a-form-item>
+      <a-form-item label="单选框">
+        <a-radio></a-radio>
+      </a-form-item>
+      <a-form-item :flex="'100px'" label="多选框">
+        <a-select></a-select>
+      </a-form-item>
+      <a-form-item :flex="'auto'" label="多选框">
+        <a-select></a-select>
+      </a-form-item>
     </formPro>
   </ConfigProvider>
 </template>

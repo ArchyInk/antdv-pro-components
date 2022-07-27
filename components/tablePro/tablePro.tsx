@@ -1,86 +1,135 @@
-import { CSSProperties, defineComponent, ExtractPropTypes, PropType, reactive, toRefs, ref, Ref, unref, watch, computed } from 'vue';
-import { ColumnType, TablePaginationConfig, tableProps } from 'ant-design-vue/es/table'
-import { cloneDeep, omit, snakeCase } from 'lodash';
-import { DefaultRecordType, PanelRender } from 'ant-design-vue/es/vc-table/interface';
-import { Checkbox, Dropdown, Menu, MenuItem, PaginationProps, Table, Button } from 'ant-design-vue';
-import { FilterValue } from 'ant-design-vue/es/table/interface';
-import Draggable from 'vuedraggable';
+import {
+  CSSProperties,
+  defineComponent,
+  ExtractPropTypes,
+  PropType,
+  reactive,
+  toRefs,
+  ref,
+  unref,
+  watch,
+  computed,
+} from 'vue'
+import {
+  ColumnType,
+  TablePaginationConfig,
+  tableProps,
+} from 'ant-design-vue/es/table'
+import { cloneDeep, omit, snakeCase } from 'lodash'
+import {
+  DefaultRecordType,
+  PanelRender,
+} from 'ant-design-vue/es/vc-table/interface'
+import {
+  Checkbox,
+  Dropdown,
+  Menu,
+  MenuItem,
+  PaginationProps,
+  Table,
+  Button,
+} from 'ant-design-vue'
+import { FilterValue } from 'ant-design-vue/es/table/interface'
+import Draggable from 'vuedraggable'
 
 import './style/index.less'
-import { ColumnHeightOutlined, FullscreenOutlined, ReloadOutlined, SettingOutlined, HolderOutlined } from '@ant-design/icons-vue';
+import {
+  ColumnHeightOutlined,
+  FullscreenOutlined,
+  ReloadOutlined,
+  SettingOutlined,
+  HolderOutlined,
+} from '@ant-design/icons-vue'
 
-export const tableProProps = () => Object.assign({}, tableProps(), {
-  // 列
-  columns: { type: Array as PropType<ColumnsProType> },
+export const tableProProps = () =>
+  Object.assign({}, tableProps(), {
+    // 列
+    columns: { type: Array as PropType<ColumnsProType> },
 
-  // 当前页
-  pageNum: { type: Number, validator: (value: number) => value > 0, default: 1 },
+    // 当前页
+    pageNum: {
+      type: Number,
+      validator: (value: number) => value > 0,
+      default: 1,
+    },
 
-  // 单页数据行数
-  pageSize: { type: Number, default: 10 },
+    // 单页数据行数
+    pageSize: { type: Number, default: 10 },
+ 
+    // 单页数据行数选择器
+    pageSizeOptions: {
+      type: Array as PropType<Array<string>>,
+      default: () => ['10', '20', '50', '100'],
+    },
 
-  // 单页数据行数选择器
-  pageSizeOptions: { type: Array as PropType<Array<string>>, default: () => ['10', '20', '50', '100'] },
+    // 显示单页数据行数选择器
+    showSizeChanger: { type: Boolean, defualt: true },
 
-  // 显示单页数据行数选择器
-  showSizeChanger: { type: Boolean, defualt: true },
+    // 显示快速跳转
+    showQuickJumper: { type: Boolean, default: true },
 
-  // 显示快速跳转
-  showQuickJumper: { type: Boolean, default: true },
+    // 显示总数量
+    showTotal: { type: Boolean, default: true },
 
-  // 显示总数量
-  showTotal: { type: Boolean, default: true },
+    // 显示分页器
+    showPagination: { type: Boolean, default: true },
 
-  // 显示分页器
-  showPagination: { type: Boolean, default: true },
+    // 数据字段名,默认为list
+    dataField: { type: String, default: 'list' },
 
-  // 数据字段名,默认为list
-  dataField: { type: String, default: 'list' },
+    // 数据获取函数
+    data: { type: Function as PropType<(parameter?: any) => Promise<any>> },
 
-  // 数据获取函数
-  data: { type: Function as PropType<(parameter?: any) => Promise<any>> },
+    // 排序字段参数名
+    sortField: { type: String, default: 'sort' },
 
-  // 排序字段参数名
-  sortField: { type: String, default: 'sort' },
+    // 升降序值名 [正序,倒序]
+    sortValues: {
+      type: Array as PropType<Array<string>>,
+      default: () => ['asc', 'desc'],
+    },
 
-  // 升降序值名 [正序,倒序]
-  sortValues: { type: Array as PropType<Array<string>>, default: () => ['asc', 'desc'] },
+    // 排序列参数名
+    orderField: { type: String, default: 'order' },
 
-  // 排序列参数名
-  orderField: { type: String, default: 'order' },
+    // 顶部样式
+    titleStyle: { type: Object as PropType<CSSProperties> },
 
-  // 顶部样式
-  titleStyle: { type: Object as PropType<CSSProperties> },
+    // pageSize
+    pageSizeField: { type: String, default: 'pageSize' },
 
-  // pageSize
-  pageSizeField: { type: String, default: 'pageSize' },
+    // pageNo
+    pageNoField: { type: String, default: 'pageNo' },
 
-  // pageNo
-  pageNoField: { type: String, default: 'pageNo' },
+    // totalPage
+    totalPageField: { type: String, default: 'total' },
 
-  // totalPage
-  totalPageField: { type: String, default: 'total' },
+    // 允许显示的列
+    accessColumns: { type: Array as PropType<Array<string>> },
 
-  // 允许显示的列
-  accessColumns: { type: Array as PropType<Array<string>> },
+    // 显示顶部工具栏
+    showTools: { type: Boolean, default: true },
+  })
 
-  // 显示顶部工具栏
-  showTools: { type: Boolean, default: true },
-})
+export type TableProProps = Partial<
+  ExtractPropTypes<ReturnType<typeof tableProProps>>
+>
 
-
-export type TableProProps = Partial<ExtractPropTypes<ReturnType<typeof tableProProps>>>
-
-export interface ColumnProType<RecordType = any> extends ColumnType<RecordType> {
-  hide?: boolean,
-  sort?: boolean | string,
+export interface ColumnProType<RecordType = any>
+  extends ColumnType<RecordType> {
+  hide?: boolean
+  sort?: boolean | string
 }
 
-export interface ColumnProGroupType<RecordType = any> extends Omit<ColumnProType<RecordType>, 'dataIndex'> {
+export interface ColumnProGroupType<RecordType = any>
+  extends Omit<ColumnProType<RecordType>, 'dataIndex'> {
   children: ColumnsProType<RecordType>
 }
 
-export declare type ColumnsProType<RecordType = any> = (ColumnProGroupType<RecordType> | ColumnProType<RecordType>)[]
+export declare type ColumnsProType<RecordType = any> = (
+  | ColumnProGroupType<RecordType>
+  | ColumnProType<RecordType>
+)[]
 
 export default defineComponent({
   name: 'TablePro',
@@ -107,19 +156,36 @@ export default defineComponent({
       totalPageField,
       showTools,
       titleStyle,
-      accessColumns
+      accessColumns,
     } = toRefs(props)
 
-    const accessCols = computed(() => accessColumns.value ? columns.value?.filter((item) => accessColumns.value?.includes(item.key as string)) : columns.value)
-    const _columns = ref<ColumnsProType>(cloneDeep(accessCols.value) as ColumnsProType)
+    const accessCols = computed(() =>
+      accessColumns.value
+        ? columns.value?.filter((item) =>
+            accessColumns.value?.includes(item.key as string)
+          )
+        : columns.value
+    )
+    const _columns = ref<ColumnsProType>(
+      cloneDeep(accessCols.value) as ColumnsProType
+    )
     const fullscreenState = ref(false)
-    const local = reactive<{ dataSource: Array<any>, loading: boolean, error: boolean, pagination?: false | TablePaginationConfig | undefined, size?: 'small' | 'middle' | 'default' | 'large', columns: ColumnsProType }>({
+    const local = reactive<{
+      dataSource: Array<any>
+      loading: boolean
+      error: boolean
+      pagination?: false | TablePaginationConfig | undefined
+      size?: 'small' | 'middle' | 'default' | 'large'
+      columns: ColumnsProType
+    }>({
       dataSource: [],
       loading: false,
       error: false,
       pagination: unref(Object.assign({}, pagination.value)),
       size: unref(size),
-      columns: _columns.value ? _columns.value.filter((item) => !item.hide) : []
+      columns: _columns.value
+        ? _columns.value.filter((item) => !item.hide)
+        : [],
     })
 
     // 渲染顶部工具栏
@@ -128,9 +194,9 @@ export default defineComponent({
       // 渲染表格size改变下拉框
       const renderTableSizeChangeOverLay = () => (
         <Menu>
-          <MenuItem onClick={() => local.size = 'default'}>默认</MenuItem>
-          <MenuItem onClick={() => local.size = 'middle'}>中等</MenuItem>
-          <MenuItem onClick={() => local.size = 'small'}>紧凑</MenuItem>
+          <MenuItem onClick={() => (local.size = 'default')}>默认</MenuItem>
+          <MenuItem onClick={() => (local.size = 'middle')}>中等</MenuItem>
+          <MenuItem onClick={() => (local.size = 'small')}>紧凑</MenuItem>
         </Menu>
       )
 
@@ -153,8 +219,9 @@ export default defineComponent({
           return !evt.draggedContext.element.fixed
         }
 
-
-        const indeterminate = computed(() => _columns.value.some((item) => item.hide))
+        const indeterminate = computed(() =>
+          _columns.value.some((item) => item.hide)
+        )
 
         const checkAll = (e: any) => {
           if (e.target.checked) {
@@ -162,13 +229,17 @@ export default defineComponent({
               if (!!item.fixed) return
               item.hide = false
             })
-            local.columns = _columns.value.filter((item: ColumnProType) => !item.hide)
+            local.columns = _columns.value.filter(
+              (item: ColumnProType) => !item.hide
+            )
           } else {
             _columns.value.forEach((item, index) => {
               if (!!item.fixed) return
-              item.hide = (index !== 0)
+              item.hide = index !== 0
             })
-            local.columns = _columns.value.filter((item: ColumnProType) => !item.hide)
+            local.columns = _columns.value.filter(
+              (item: ColumnProType) => !item.hide
+            )
           }
         }
 
@@ -178,73 +249,139 @@ export default defineComponent({
             onStart={dragStart}
             move={dragMove}
             v-model={_columns.value}
-            class="table-pro__columns"
+            class='table-pro__columns'
             component-data={{
               type: 'transition-group',
               name: 'flip-list',
             }}
-            {... {
+            {...{
               animation: 200,
-              group: "description",
+              group: 'description',
               disabled: false,
-              ghostClass: "ghost"
+              ghostClass: 'ghost',
             }}
-            item-key="key"
+            item-key='key'
             v-slots={{
-              header: () => (<div class="table-pro__columns__header" onClick={(e) => e.stopPropagation()}>
-                <Checkbox defaultChecked={true} indeterminate={indeterminate.value} onChange={checkAll} >列筛选/排序</Checkbox>
-                <Button type={"text"} size={"small"} onClick={resetColumns} >重置</Button>
-              </div >),
+              header: () => (
+                <div
+                  class='table-pro__columns__header'
+                  onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    defaultChecked={true}
+                    indeterminate={indeterminate.value}
+                    onChange={checkAll}>
+                    列筛选/排序
+                  </Checkbox>
+                  <Button type={'text'} size={'small'} onClick={resetColumns}>
+                    重置
+                  </Button>
+                </div>
+              ),
               item: ({ element }: any) => {
                 const checked = ref(!element.hide)
                 const onChange = (e: any) => {
-                  if (!e.target.checked && _columns.value.filter((item) => !item.hide).length === 1) {
-                    return;
+                  if (
+                    !e.target.checked &&
+                    _columns.value.filter((item) => !item.hide).length === 1
+                  ) {
+                    return
                   }
                   element.hide = !e.target.checked
-                  local.columns = _columns.value.filter((item: ColumnProType) => !item.hide)
+                  local.columns = _columns.value.filter(
+                    (item: ColumnProType) => !item.hide
+                  )
                 }
                 return (
-                  <div class={`table-pro__columns__item ${!!element.fixed ? 'table-pro__columns__item--disabled' : ''}`} onClick={(e) => { e.stopPropagation() }}>
-                    <li class={`table-pro__columns__item__icon`}  >
-                      <i class={`${element.fixed ? 'fa fa-anchor' : 'glyphicon glyphicon-pushpin'}`} onClick={() => element.fixed = !element.fixed} aria-hidden="true"> </i>
-                      {element.fixed ? <div style={{ width: '1em', height: '1em' }}></div> : <HolderOutlined />}
+                  <div
+                    class={`table-pro__columns__item ${
+                      !!element.fixed
+                        ? 'table-pro__columns__item--disabled'
+                        : ''
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                    }}>
+                    <li class={`table-pro__columns__item__icon`}>
+                      <i
+                        class={`${
+                          element.fixed
+                            ? 'fa fa-anchor'
+                            : 'glyphicon glyphicon-pushpin'
+                        }`}
+                        onClick={() => (element.fixed = !element.fixed)}
+                        aria-hidden='true'>
+                        {' '}
+                      </i>
+                      {element.fixed ? (
+                        <div style={{ width: '1em', height: '1em' }}></div>
+                      ) : (
+                        <HolderOutlined />
+                      )}
                     </li>
-                    <Checkbox class={`table-pro__columns__item__title `} disabled={!!element.fixed} v-model:checked={checked.value} onChange={onChange}>{element.title}</Checkbox>
-                  </div >)
+                    <Checkbox
+                      class={`table-pro__columns__item__title `}
+                      disabled={!!element.fixed}
+                      v-model:checked={checked.value}
+                      onChange={onChange}>
+                      {element.title}
+                    </Checkbox>
+                  </div>
+                )
               },
             }}
           />
         )
       }
 
-      return (
-        fullscreenState.value ? null :
-          (<div class="table-pro__title" style={titleStyle.value}>
-            <div>{slots.title?.(currentPageData)}</div>
-            {showTools.value ? <div class="table-pro__title__tools">
+      return fullscreenState.value ? null : (
+        <div class='table-pro__title' style={titleStyle.value}>
+          <div>{slots.title?.(currentPageData)}</div>
+          {showTools.value ? (
+            <div class='table-pro__title__tools'>
               <div>
-                <ReloadOutlined onClick={() => { refresh() }} />
+                <ReloadOutlined
+                  onClick={() => {
+                    refresh()
+                  }}
+                />
               </div>
               <div>
-                <Dropdown placement="bottom" trigger={['click']} v-slots={{ overlay: () => renderTableSizeChangeOverLay() }}>
+                <Dropdown
+                  placement='bottom'
+                  trigger={['click']}
+                  v-slots={{ overlay: () => renderTableSizeChangeOverLay() }}>
                   <ColumnHeightOutlined />
                 </Dropdown>
               </div>
               <div>
-                <Dropdown placement="bottom" trigger={['click']} v-slots={{ overlay: () => renderTableColumnsSetttingOverLay() }}>
+                <Dropdown
+                  placement='bottom'
+                  trigger={['click']}
+                  v-slots={{
+                    overlay: () => renderTableColumnsSetttingOverLay(),
+                  }}>
                   <SettingOutlined />
                 </Dropdown>
               </div>
               <div>
-                <FullscreenOutlined onClick={() => fullscreenState.value = !fullscreenState.value} />
+                <FullscreenOutlined
+                  onClick={() =>
+                    (fullscreenState.value = !fullscreenState.value)
+                  }
+                />
               </div>
-            </div> : null}
-          </div>)
+            </div>
+          ) : null}
+        </div>
       )
     }
 
-    const loadData = (pagination?: PaginationProps, filters?: Record<string, FilterValue | null>, sorter?: any, extra?: any) => {
+    const loadData = (
+      pagination?: PaginationProps,
+      filters?: Record<string, FilterValue | null>,
+      sorter?: any,
+      extra?: any
+    ) => {
       if (sorter?.order) {
         sorter.order = sortValues.value[sorter.order === 'ascend' ? 0 : 1]
       }
@@ -253,63 +390,90 @@ export default defineComponent({
 
       const p = Object.assign(
         {
-          [pageNoField.value]: (pagination?.current) || (showPagination.value && (local.pagination && local.pagination!.current)) || pageNum.value,
-          [pageSizeField.value]: (pagination?.pageSize) || (showPagination.value && (local.pagination && local.pagination!.current)) || pageSize.value,
+          [pageNoField.value]:
+            pagination?.current ||
+            (showPagination.value &&
+              local.pagination &&
+              local.pagination!.current) ||
+            pageNum.value,
+          [pageSizeField.value]:
+            pagination?.pageSize ||
+            (showPagination.value &&
+              local.pagination &&
+              local.pagination!.current) ||
+            pageSize.value,
         },
-        (sorter?.field && { [sortField.value]: sorter.column.sorter === true ? snakeCase(sorter.field) : sorter.column.sorter }) || {},
+        (sorter?.field && {
+          [sortField.value]:
+            sorter.column.sorter === true
+              ? snakeCase(sorter.field)
+              : sorter.column.sorter,
+        }) ||
+          {},
         (sorter?.order && { [orderField.value]: sorter.order }) || {},
         {
-          ...filters
+          ...filters,
         }
       )
 
       const result = data.value!(p)
 
-      result.then((res: any) => {
-        if (!res[dataField.value]) {
-          console.warn(`[sgd-pro-components]${dataField.value} is undefined in record!`);
-          local.dataSource = []
-          local.loading = false
-          return
-        }
-
-        if (local.pagination !== false) {
-          if (!showPagination.value || !res[totalPageField.value]) {
-            local.pagination = false
-          } else {
-            local.pagination = Object.assign({}, local.pagination, {
-              current: res[pageNoField.value],
-              total: res[totalPageField.value],
-              showTotal: showTotal.value && ((total: number) => `总共 ${total} 项`),
-              showSizeChanger: showSizeChanger.value,
-              showQuickJumper: showQuickJumper.value,
-              pageSizeOptions: pageSizeOptions.value,
-              pageSize: pagination?.pageSize || local.pagination!.pageSize
-            })
-
-            // 如果没有数据则返回上一页
-            if (res[dataField.value].length === 0 && (local.pagination.current! > 1)) {
-              local.pagination.current!--
-              loadData(pagination)
-              return
-            }
+      result
+        .then((res: any) => {
+          if (!res[dataField.value]) {
+            console.warn(
+              `[sgd-pro-components]${dataField.value} is undefined in record!`
+            )
+            local.dataSource = []
+            local.loading = false
+            return
           }
-          local.dataSource = res[dataField.value] as object[]
+
+          if (local.pagination !== false) {
+            if (!showPagination.value || !res[totalPageField.value]) {
+              local.pagination = false
+            } else {
+              local.pagination = Object.assign({}, local.pagination, {
+                current: res[pageNoField.value],
+                total: res[totalPageField.value],
+                showTotal:
+                  showTotal.value && ((total: number) => `总共 ${total} 项`),
+                showSizeChanger: showSizeChanger.value,
+                showQuickJumper: showQuickJumper.value,
+                pageSizeOptions: pageSizeOptions.value,
+                pageSize: pagination?.pageSize || local.pagination!.pageSize,
+              })
+
+              // 如果没有数据则返回上一页
+              if (
+                res[dataField.value].length === 0 &&
+                local.pagination.current! > 1
+              ) {
+                local.pagination.current!--
+                loadData(pagination)
+                return
+              }
+            }
+            local.dataSource = res[dataField.value] as object[]
+            local.loading = false
+          }
+        })
+        .catch(() => {
+          local.dataSource = []
+          local.error = true
           local.loading = false
-        }
-      }).catch(() => {
-        local.dataSource = []
-        local.error = true
-        local.loading = false
-      })
+        })
     }
 
     const refresh = (bool = false) => {
       if (bool && showPagination.value) {
-        local.pagination = Object.assign({}, {
-          [pageNoField.value]: 1,
-          [pageSizeField.value]: pageSize.value
-        })
+        local.pagination = Object.assign(
+          {},
+          {
+            [pageNoField.value]: 1,
+            [pageSizeField.value]: pageSize.value,
+          }
+        )
       }
 
       // local.dataSource = []
@@ -319,14 +483,16 @@ export default defineComponent({
 
     expose({ refresh })
 
-    local.pagination = showPagination.value && Object.assign({}, local.pagination, {
-      [pageNoField.value]: pageNum.value,
-      [pageSizeField.value]: pageSize.value,
-      showTotal: showTotal.value && ((total: number) => `总共${total}项`),
-      showSizeChanger: showSizeChanger.value,
-      showQuickJumper: showQuickJumper.value,
-      pageSizeOptions: pageSizeOptions.value,
-    })
+    local.pagination =
+      showPagination.value &&
+      Object.assign({}, local.pagination, {
+        [pageNoField.value]: pageNum.value,
+        [pageSizeField.value]: pageSize.value,
+        showTotal: showTotal.value && ((total: number) => `总共${total}项`),
+        showSizeChanger: showSizeChanger.value,
+        showQuickJumper: showQuickJumper.value,
+        pageSizeOptions: pageSizeOptions.value,
+      })
 
     loadData()
 
@@ -336,15 +502,28 @@ export default defineComponent({
 
     return () => {
       const _props = Object.assign({}, props, local)
-      const renderTable = (<Table {..._props} onChange={loadData} v-slots={{
-        ...slots,
-        title: (slots.title || showTools.value) && ((currentPageData: PanelRender<DefaultRecordType>) => renderTitle(currentPageData)),
-      }} />
+      const renderTable = (
+        <Table
+          {..._props}
+          onChange={loadData}
+          v-slots={{
+            ...slots,
+            title:
+              (slots.title || showTools.value) &&
+              ((currentPageData: PanelRender<DefaultRecordType>) =>
+                renderTitle(currentPageData)),
+          }}
+        />
       )
 
-      return <fullscreen ref="fullscreenEle" v-model={fullscreenState.value} fullscreenClass="table-pro--fullscreen">
-        {renderTable}
-      </fullscreen>
+      return (
+        <fullscreen
+          ref='fullscreenEle'
+          v-model={fullscreenState.value}
+          fullscreenClass='table-pro--fullscreen'>
+          {renderTable}
+        </fullscreen>
+      )
     }
-  }
+  },
 })
