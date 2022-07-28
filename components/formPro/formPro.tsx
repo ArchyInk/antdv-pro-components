@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-27 15:34:03
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-27 22:31:19
+ * @LastEditTime: 2022-07-28 15:55:15
  * @FilePath: \ant-design-vue-pro\components\formPro\formPro.tsx
  * @description:
  */
@@ -17,12 +17,13 @@ import {
   ref,
   toRefs,
   VNode,
-  Component,
   RendererNode,
   RendererElement,
+  provide,
 } from 'vue'
 
-import { Form, Row, Col, Space, FormItemProps } from 'ant-design-vue'
+import { Form, Row } from 'ant-design-vue'
+import FormProItem, { FormProItemProps } from './formProItem'
 
 import { formProps } from 'ant-design-vue/es/form/Form'
 import ResponsiveObserve, {
@@ -33,11 +34,11 @@ import { DEFAULT_COLUMN_MAP } from '../shared/constant'
 import { chunk } from 'lodash'
 
 import './style/index.less'
-import { RenderNode } from 'ant-design-vue/lib/vc-select/BaseSelect'
 
 const formProProps = () =>
   Object.assign({}, formProps(), {
     mode: { type: String as PropType<'edit' | 'view'>, default: 'edit' },
+    disabled: { type: Boolean, default: false },
     column: { type: [Number, Object] },
     space: {
       type: [String, Number] as PropType<'small' | 'middle' | 'large' | number>,
@@ -49,19 +50,19 @@ export type FormProProps = Partial<
   ExtractPropTypes<ReturnType<typeof formProProps>>
 >
 
-export interface FormItemProProps extends FormItemProps {
-  span?: number
-  offset?: number
-  flex?: number
-}
 
 export default defineComponent({
   name: 'FormPro',
   props: formProProps(),
   setup(props, { slots }) {
     let token: number
-    const { column, space } = toRefs(props)
+    const { column, space, mode, disabled } = toRefs(props)
     const screens = ref<ScreenMap>({})
+    const currentColumn = ref<number>(3)
+    provide('disabled', disabled)
+    provide('column', currentColumn)
+    provide('mode', mode)
+
 
     // 间隔转换
     const gutter = computed<number>(() => {
@@ -76,10 +77,6 @@ export default defineComponent({
       return space.value
     })
 
-    // 数据
-    const local = reactive({
-      column: 3,
-    })
 
     onBeforeMount(() => {
       token = ResponsiveObserve.subscribe((screen) => {
@@ -87,7 +84,7 @@ export default defineComponent({
           return
         }
         screens.value = screen
-        local.column = getColumn()
+        currentColumn.value = getColumn()
       })
     })
 
@@ -116,35 +113,28 @@ export default defineComponent({
           return DEFAULT_COLUMN_MAP[bp]
         }
       }
+
+      return 3
     }
 
     const renderGrid = () => {
       const childrenNode:
-        | VNode<RendererNode, RendererElement, FormItemProProps>[]
+        | VNode<RendererNode, RendererElement, FormProItemProps>[]
         | undefined = slots.default?.()
       if (!childrenNode) {
         return
       }
-      return chunk(childrenNode, local.column).map((rowArray) => {
+      return chunk(childrenNode, currentColumn.value).map((rowArray) => {
         return (
           <Row align={'middle'} gutter={gutter.value}>
-            {rowArray.map((item) => {
-              return (
-                <Col
-                  offset={item.props?.offset}
-                  span={item.props?.span ??  24 / local.column}
-                  flex={item.props?.flex}>
-                  {item}
-                </Col>
-              )
-            })}
+            {rowArray}
           </Row>
         )
       })
     }
 
     return () => {
-      return <Form>{renderGrid()}</Form>
+      return <Form {...props}>{renderGrid()}</Form>
     }
   },
 })

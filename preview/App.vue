@@ -2,17 +2,18 @@
  * @author: Archy
  * @Date: 2022-07-15 15:02:07
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-27 22:27:52
+ * @LastEditTime: 2022-07-28 15:53:46
  * @FilePath: \ant-design-vue-pro\preview\App.vue
  * @description: 
 -->
 <script setup lang="ts">
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import tablePro, { ColumnsProType } from '../components/tablePro/tablePro';
-import formPro from '../components/formPro/formPro'
+import FormPro from '../components/formPro/formPro'
+import FormProItem from '../components/formPro/formProItem'
 import { ConfigProvider } from 'ant-design-vue';
 import testRow from './com/test-form-row.vue'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 const columns = ref<ColumnsProType>([
   { title: '姓名1', key: '1', dataIndex: 'name' },
   { title: '姓名2', key: '2', dataIndex: 'name' },
@@ -36,28 +37,44 @@ const getData = (p: any) => {
     return ress.obj
   })
 }
+const disabled = ref(false)
+const flex = ref('100px')
+const label = ref('选择')
+const model = reactive({
+  one: '一',
+  two: '二',
+  three: '三',
+  true: true
+})
 </script>
 
 <template>
   <ConfigProvider :locale="zhCN">
+    <a-button @click="() => {
+      disabled = !disabled
+      flex = '200px'
+      label = '选择啊'
+    }">test</a-button>
     <!-- <tablePro :data="getData" :columns="columns"></tablePro>  -->
-    <formPro>
-      <a-form-item label="输入框">
-        <a-input></a-input>
-      </a-form-item>
-      <a-form-item label="选择框">
+    <FormPro :disabled="disabled">
+      <FormProItem label="输入框">
+        <a-input v-model:value="model.one"></a-input>
+      </FormProItem>
+      <FormProItem label="选择框">
+        <a-select v-model:value="model.two"></a-select>
+      </FormProItem>
+      <FormProItem label="单选框">
+        <a-radio v-model:checked="model.true"></a-radio>
+      </FormProItem>
+      <FormProItem :label="label">
         <a-select></a-select>
-      </a-form-item>
-      <a-form-item label="单选框">
-        <a-radio></a-radio>
-      </a-form-item>
-      <a-form-item :flex="'100px'" label="多选框">
+      </FormProItem>
+      <FormProItem label="多选框">
+        <a-select :style="{ width: '100%' }"></a-select>
         <a-select></a-select>
-      </a-form-item>
-      <a-form-item :flex="'auto'" label="多选框">
         <a-select></a-select>
-      </a-form-item>
-    </formPro>
+      </FormProItem>
+    </FormPro>
   </ConfigProvider>
 </template>
 
