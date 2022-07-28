@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-27 15:34:03
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-28 15:55:15
+ * @LastEditTime: 2022-07-28 22:47:03
  * @FilePath: \ant-design-vue-pro\components\formPro\formPro.tsx
  * @description:
  */
@@ -13,7 +13,7 @@ import {
   onBeforeMount,
   onBeforeUnmount,
   PropType,
-  reactive,
+  ComponentPublicInstance,
   ref,
   toRefs,
   VNode,
@@ -34,6 +34,11 @@ import { DEFAULT_COLUMN_MAP } from '../shared/constant'
 import { chunk } from 'lodash'
 
 import './style/index.less'
+import {
+  Props,
+  ValidateInfo,
+  validateOptions,
+} from 'ant-design-vue/es/form/useForm'
 
 const formProProps = () =>
   Object.assign({}, formProps(), {
@@ -44,25 +49,80 @@ const formProProps = () =>
       type: [String, Number] as PropType<'small' | 'middle' | 'large' | number>,
       default: 'small',
     },
+    immediate: Boolean,
+    deep: Boolean,
+    validateOnRuleChange: Boolean,
+    debounce: Object as PropType<DebounceSettings>,
   })
 
 export type FormProProps = Partial<
   ExtractPropTypes<ReturnType<typeof formProProps>>
 >
 
+declare type namesType = string | string[]
+
+export interface FormProExpose {
+  clearValidate: (names?: namesType) => void
+  resetFields: (newValues?: Props) => void
+  mergeValidateInfo: (items: ValidateInfo | ValidateInfo[]) => ValidateInfo
+  validate: <T = any>(names?: namesType, option?: validateOptions) => Promise<T>
+}
+
+export type FormProInstance = ComponentPublicInstance<
+  FormProProps,
+  FormProExpose
+>
+
+export interface DebounceSettings {
+  leading?: boolean
+  wait?: number
+  trailing?: boolean
+}
 
 export default defineComponent({
   name: 'FormPro',
   props: formProProps(),
-  setup(props, { slots }) {
+  setup(props, { slots, expose }) {
     let token: number
-    const { column, space, mode, disabled } = toRefs(props)
+    const {
+      column,
+      space,
+      mode,
+      disabled,
+      model,
+      rules,
+      immediate,
+      deep,
+      debounce,
+      validateOnRuleChange,
+    } = toRefs(props)
     const screens = ref<ScreenMap>({})
     const currentColumn = ref<number>(3)
+    const {
+      clearValidate,
+      resetFields,
+      validateInfos,
+      mergeValidateInfo,
+      validateField,
+      validate,
+    } = Form.useForm(model.value, rules.value, {
+      immediate: immediate.value,
+      deep: deep.value,
+      debounce: debounce.value,
+      validateOnRuleChange: validateOnRuleChange.value,
+    })
+
     provide('disabled', disabled)
     provide('column', currentColumn)
     provide('mode', mode)
+    provide('validateInfos', validateInfos)
 
+    expose({
+      clearValidate,
+      resetFields,
+      mergeValidateInfo,
+      validate,
+    })
 
     // 间隔转换
     const gutter = computed<number>(() => {
@@ -76,7 +136,6 @@ export default defineComponent({
       }
       return space.value
     })
-
 
     onBeforeMount(() => {
       token = ResponsiveObserve.subscribe((screen) => {
