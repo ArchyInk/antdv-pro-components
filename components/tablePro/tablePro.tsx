@@ -9,6 +9,8 @@ import {
   unref,
   watch,
   computed,
+  toRaw,
+  Ref
 } from 'vue'
 import {
   ColumnType,
@@ -20,6 +22,7 @@ import {
   DefaultRecordType,
   PanelRender,
 } from 'ant-design-vue/es/vc-table/interface'
+import { DefaultOptionType } from 'ant-design-vue/lib/select'
 import {
   Checkbox,
   Dropdown,
@@ -28,6 +31,12 @@ import {
   PaginationProps,
   Table,
   Button,
+  Card,
+  Space,
+  Input,
+  Select,
+  TimePicker,
+  TimeRangePicker
 } from 'ant-design-vue'
 import { FilterValue } from 'ant-design-vue/es/table/interface'
 import Draggable from 'vuedraggable'
@@ -40,9 +49,12 @@ import {
   SettingOutlined,
   HolderOutlined,
 } from '@ant-design/icons-vue'
+import FormPro from '../formPro'
+import FormProItem from '../formPro/formProItem'
+import { FormProInstance } from '../formPro/formPro'
 
 export const tableProProps = () =>
-  Object.assign({}, tableProps(), {
+  Object.assign({}, omit(tableProps(), 'columns'), {
     // 列
     columns: { type: Array as PropType<ColumnsProType> },
 
@@ -55,7 +67,7 @@ export const tableProProps = () =>
 
     // 单页数据行数
     pageSize: { type: Number, default: 10 },
- 
+
     // 单页数据行数选择器
     pageSizeOptions: {
       type: Array as PropType<Array<string>>,
@@ -109,16 +121,32 @@ export const tableProProps = () =>
 
     // 显示顶部工具栏
     showTools: { type: Boolean, default: true },
+
+    // 显示搜索表单
+    showSearchForm: { type: Boolean },
+
+    // 卡片边框
+    cardBordered: { type: Boolean, default: true },
+
+    // 卡片内容自定义样式
+    cardBodyStyle: { type: Object }
   })
 
 export type TableProProps = Partial<
   ExtractPropTypes<ReturnType<typeof tableProProps>>
 >
 
+export type SearchFormItemType = 'select' | 'input' | 'timePicker' | 'timeRangePicker' | 'custom'
+
 export interface ColumnProType<RecordType = any>
   extends ColumnType<RecordType> {
   hide?: boolean
   sort?: boolean | string
+  formItemType?: SearchFormItemType
+  customRenderFormItem?: (model: { [key: string]: any }) => JSX.Element
+  selectOptions?: DefaultOptionType[] | (() => DefaultOptionType[])
+  timeFormat?: string
+  order?: number
 }
 
 export interface ColumnProGroupType<RecordType = any>
@@ -157,13 +185,15 @@ export default defineComponent({
       showTools,
       titleStyle,
       accessColumns,
+      cardBodyStyle,
+      cardBordered
     } = toRefs(props)
 
     const accessCols = computed(() =>
       accessColumns.value
         ? columns.value?.filter((item) =>
-            accessColumns.value?.includes(item.key as string)
-          )
+          accessColumns.value?.includes(item.key as string)
+        )
         : columns.value
     )
     const _columns = ref<ColumnsProType>(
@@ -190,6 +220,8 @@ export default defineComponent({
 
     // 渲染顶部工具栏
     const dragging = ref<boolean>(false)
+    const formInstance = ref<FormProInstance>()
+
     const renderTitle = (currentPageData: PanelRender<DefaultRecordType>) => {
       // 渲染表格size改变下拉框
       const renderTableSizeChangeOverLay = () => (
@@ -293,21 +325,19 @@ export default defineComponent({
                 }
                 return (
                   <div
-                    class={`table-pro__columns__item ${
-                      !!element.fixed
-                        ? 'table-pro__columns__item--disabled'
-                        : ''
-                    }`}
+                    class={`table-pro__columns__item ${!!element.fixed
+                      ? 'table-pro__columns__item--disabled'
+                      : ''
+                      }`}
                     onClick={(e) => {
                       e.stopPropagation()
                     }}>
                     <li class={`table-pro__columns__item__icon`}>
                       <i
-                        class={`${
-                          element.fixed
-                            ? 'fa fa-anchor'
-                            : 'glyphicon glyphicon-pushpin'
-                        }`}
+                        class={`${element.fixed
+                          ? 'fa fa-anchor'
+                          : 'glyphicon glyphicon-pushpin'
+                          }`}
                         onClick={() => (element.fixed = !element.fixed)}
                         aria-hidden='true'>
                         {' '}
@@ -376,6 +406,23 @@ export default defineComponent({
       )
     }
 
+    const model = reactive<{ [key: string]: any }>({})
+
+    const formItemColumns: ColumnProType[] = accessCols.value!.filter((item: ColumnProType) => {
+      if (!item.dataIndex) {
+        return false
+      }
+      return !!item.formItemType
+    })
+    const timeRangePicker = ref([])
+    formItemColumns.forEach((column) => {
+      if (column.formItemType === 'input') {
+        model[column.dataIndex as string] = ''
+      } else {
+        model[column.dataIndex as string] = undefined
+      }
+    })
+
     const loadData = (
       pagination?: PaginationProps,
       filters?: Record<string, FilterValue | null>,
@@ -409,11 +456,12 @@ export default defineComponent({
               ? snakeCase(sorter.field)
               : sorter.column.sorter,
         }) ||
-          {},
+        {},
         (sorter?.order && { [orderField.value]: sorter.order }) || {},
         {
           ...filters,
-        }
+        },
+        toRaw(model)
       )
 
       const result = data.value!(p)
@@ -465,6 +513,45 @@ export default defineComponent({
         })
     }
 
+
+
+    const renderSearchForm = () => {
+      if (!accessCols.value) {
+        return
+      }
+
+      if (!(formItemColumns.length > 0)) {
+        return
+      }
+
+      const renderFormItem = (column: ColumnProType) => {
+        switch (column.formItemType) {
+          case 'input': return <Input v-model:value={model[column.dataIndex as string]} placeholder="请输入"></Input>
+          case 'select': return <Select v-model:value={model[column.dataIndex as string]} placeholder="请选择" options={typeof column.selectOptions === 'function' ? column.selectOptions?.() : column.selectOptions}></Select>
+          case 'timePicker': return <TimePicker v-model:value={model[column.dataIndex as string]} style={{ width: '100%' }} placeholder="请选择时间" valueFormat={column.timeFormat}></TimePicker>
+          default: return column.customRenderFormItem?.(model)
+        }
+      }
+      return <Card bodyStyle={cardBodyStyle.value} bordered={cardBordered.value} style={{ borderRadius: '0', width: '100%' }}>
+        <FormPro model={model} ref={formInstance}>
+          {formItemColumns.map((column) => {
+            return <FormProItem order={column.order} label={column.title} name={column.dataIndex as string}>{renderFormItem(column)}</FormProItem>
+          })}
+          <FormProItem span="auto" flex="auto">
+            <Space style={{ float: 'right' }}>
+              <Button type={"primary"} onClick={() => {
+                refresh()
+              }}>搜索</Button>
+              <Button onClick={() => {
+                formInstance.value?.resetFields()
+              }}>重置</Button>
+            </Space>
+          </FormProItem>
+        </FormPro>
+      </Card>
+    }
+
+
     const refresh = (bool = false) => {
       if (bool && showPagination.value) {
         local.pagination = Object.assign(
@@ -503,25 +590,31 @@ export default defineComponent({
     return () => {
       const _props = Object.assign({}, props, local)
       const renderTable = (
-        <Table
-          {..._props}
-          onChange={loadData}
-          v-slots={{
-            ...slots,
-            title:
-              (slots.title || showTools.value) &&
-              ((currentPageData: PanelRender<DefaultRecordType>) =>
-                renderTitle(currentPageData)),
-          }}
-        />
+        <Card bodyStyle={cardBodyStyle.value} bordered={cardBordered.value} style={{ borderRadius: '0', width: '100%' }}>
+          <Table
+            {..._props}
+            onChange={loadData}
+            v-slots={{
+              ...slots,
+              title:
+                (slots.title || showTools.value) &&
+                ((currentPageData: PanelRender<DefaultRecordType>) =>
+                  renderTitle(currentPageData)),
+            }}
+          />
+        </Card>
       )
 
       return (
+
         <fullscreen
           ref='fullscreenEle'
           v-model={fullscreenState.value}
           fullscreenClass='table-pro--fullscreen'>
-          {renderTable}
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            {renderSearchForm()}
+            {renderTable}
+          </Space>
         </fullscreen>
       )
     }

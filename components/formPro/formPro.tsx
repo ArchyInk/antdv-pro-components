@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-27 15:34:03
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-28 22:47:03
+ * @LastEditTime: 2022-07-29 14:26:28
  * @FilePath: \ant-design-vue-pro\components\formPro\formPro.tsx
  * @description:
  */
@@ -23,7 +23,7 @@ import {
 } from 'vue'
 
 import { Form, Row } from 'ant-design-vue'
-import FormProItem, { FormProItemProps } from './formProItem'
+import { FormProItemProps } from './formProItem'
 
 import { formProps } from 'ant-design-vue/es/form/Form'
 import ResponsiveObserve, {
@@ -31,7 +31,7 @@ import ResponsiveObserve, {
   ScreenMap,
 } from 'ant-design-vue/es/_util/responsiveObserve'
 import { DEFAULT_COLUMN_MAP } from '../shared/constant'
-import { chunk } from 'lodash'
+import { chunk, omit, pick } from 'lodash'
 
 import './style/index.less'
 import {
@@ -39,21 +39,21 @@ import {
   ValidateInfo,
   validateOptions,
 } from 'ant-design-vue/es/form/useForm'
+import { rowProps } from 'ant-design-vue/lib/grid/Row'
 
-const formProProps = () =>
-  Object.assign({}, formProps(), {
+const formProProps = () => {
+  const _rowProps = rowProps()
+  _rowProps.gutter.default = 24
+  return Object.assign({}, formProps(), _rowProps, {
     mode: { type: String as PropType<'edit' | 'view'>, default: 'edit' },
     disabled: { type: Boolean, default: false },
     column: { type: [Number, Object] },
-    space: {
-      type: [String, Number] as PropType<'small' | 'middle' | 'large' | number>,
-      default: 'small',
-    },
     immediate: Boolean,
     deep: Boolean,
     validateOnRuleChange: Boolean,
     debounce: Object as PropType<DebounceSettings>,
   })
+}
 
 export type FormProProps = Partial<
   ExtractPropTypes<ReturnType<typeof formProProps>>
@@ -86,7 +86,6 @@ export default defineComponent({
     let token: number
     const {
       column,
-      space,
       mode,
       disabled,
       model,
@@ -103,14 +102,16 @@ export default defineComponent({
       resetFields,
       validateInfos,
       mergeValidateInfo,
-      validateField,
       validate,
+      modelRef,
+      rulesRef
     } = Form.useForm(model.value, rules.value, {
       immediate: immediate.value,
       deep: deep.value,
       debounce: debounce.value,
       validateOnRuleChange: validateOnRuleChange.value,
     })
+
 
     provide('disabled', disabled)
     provide('column', currentColumn)
@@ -122,20 +123,13 @@ export default defineComponent({
       resetFields,
       mergeValidateInfo,
       validate,
+      modelRef,
+      rulesRef
     })
 
-    // 间隔转换
-    const gutter = computed<number>(() => {
-      switch (space.value) {
-        case 'small':
-          return 16
-        case 'middle':
-          return 24
-        case 'large':
-          return 32
-      }
-      return space.value
-    })
+    const _rowProps = computed(() => pick(props, Object.keys(rowProps())))
+    const _formProps = computed(() => omit(props, Object.keys(rowProps())))
+
 
     onBeforeMount(() => {
       token = ResponsiveObserve.subscribe((screen) => {
@@ -183,17 +177,16 @@ export default defineComponent({
       if (!childrenNode) {
         return
       }
-      return chunk(childrenNode, currentColumn.value).map((rowArray) => {
-        return (
-          <Row align={'middle'} gutter={gutter.value}>
-            {rowArray}
-          </Row>
-        )
-      })
+
+      return (
+        <Row {..._rowProps.value} >
+          {childrenNode}
+        </Row>
+      )
     }
 
     return () => {
-      return <Form {...props}>{renderGrid()}</Form>
+      return <Form {..._formProps.value}>{renderGrid()}</Form>
     }
   },
 })
