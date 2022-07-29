@@ -123,7 +123,7 @@ export const tableProProps = () =>
     showTools: { type: Boolean, default: true },
 
     // 显示搜索表单
-    showSearchForm: { type: Boolean },
+    showSearchForm: { type: Boolean, default: false },
 
     // 卡片边框
     cardBordered: { type: Boolean, default: true },
@@ -136,7 +136,7 @@ export type TableProProps = Partial<
   ExtractPropTypes<ReturnType<typeof tableProProps>>
 >
 
-export type SearchFormItemType = 'select' | 'input' | 'timePicker' | 'timeRangePicker' | 'custom'
+export type SearchFormItemType = 'select' | 'input' | 'timePicker' | 'timeRangePicker'
 
 export interface ColumnProType<RecordType = any>
   extends ColumnType<RecordType> {
@@ -147,6 +147,8 @@ export interface ColumnProType<RecordType = any>
   selectOptions?: DefaultOptionType[] | (() => DefaultOptionType[])
   timeFormat?: string
   order?: number
+  formItemLabel?: string
+  showInForm?: boolean
 }
 
 export interface ColumnProGroupType<RecordType = any>
@@ -186,10 +188,11 @@ export default defineComponent({
       titleStyle,
       accessColumns,
       cardBodyStyle,
-      cardBordered
+      cardBordered,
+      showSearchForm
     } = toRefs(props)
 
-    const accessCols = computed(() =>
+    const accessCols = computed<ColumnsProType | undefined>(() =>
       accessColumns.value
         ? columns.value?.filter((item) =>
           accessColumns.value?.includes(item.key as string)
@@ -408,20 +411,15 @@ export default defineComponent({
 
     const model = reactive<{ [key: string]: any }>({})
 
-    const formItemColumns: ColumnProType[] = accessCols.value!.filter((item: ColumnProType) => {
-      if (!item.dataIndex) {
-        return false
-      }
-      return !!item.formItemType
-    })
-    const timeRangePicker = ref([])
-    formItemColumns.forEach((column) => {
-      if (column.formItemType === 'input') {
-        model[column.dataIndex as string] = ''
+    accessCols.value!.forEach((item: ColumnProType) => {
+      if (!item.dataIndex) return
+      if (item.formItemType === 'input') {
+        model[item.dataIndex as string] = ''
       } else {
-        model[column.dataIndex as string] = undefined
+        model[item.dataIndex as string] = undefined
       }
     })
+
 
     const loadData = (
       pagination?: PaginationProps,
@@ -520,22 +518,22 @@ export default defineComponent({
         return
       }
 
-      if (!(formItemColumns.length > 0)) {
-        return
-      }
 
       const renderFormItem = (column: ColumnProType) => {
-        switch (column.formItemType) {
-          case 'input': return <Input v-model:value={model[column.dataIndex as string]} placeholder="请输入"></Input>
-          case 'select': return <Select v-model:value={model[column.dataIndex as string]} placeholder="请选择" options={typeof column.selectOptions === 'function' ? column.selectOptions?.() : column.selectOptions}></Select>
-          case 'timePicker': return <TimePicker v-model:value={model[column.dataIndex as string]} style={{ width: '100%' }} placeholder="请选择时间" valueFormat={column.timeFormat}></TimePicker>
-          default: return column.customRenderFormItem?.(model)
-        }
+        return <FormProItem order={column.order} label={column.formItemLabel ?? column.title} name={column.dataIndex as string}>{(() => {
+          switch (column.formItemType) {
+            case 'input': return <Input v-model:value={model[column.dataIndex as string]} placeholder="请输入"></Input>
+            case 'select': return <Select v-model:value={model[column.dataIndex as string]} placeholder="请选择" options={typeof column.selectOptions === 'function' ? column.selectOptions?.() : column.selectOptions}></Select>
+            case 'timePicker': return <TimePicker v-model:value={model[column.dataIndex as string]} style={{ width: '100%' }} placeholder="请选择时间" valueFormat={column.timeFormat}></TimePicker>
+            default: return column.customRenderFormItem?.(model) ?? slots.formItem?.({ column, model })
+          }
+        })()}</FormProItem>
       }
       return <Card bodyStyle={cardBodyStyle.value} bordered={cardBordered.value} style={{ borderRadius: '0', width: '100%' }}>
         <FormPro model={model} ref={formInstance}>
-          {formItemColumns.map((column) => {
-            return <FormProItem order={column.order} label={column.title} name={column.dataIndex as string}>{renderFormItem(column)}</FormProItem>
+          {accessCols.value.map((column: ColumnProType) => {
+            if (!column.dataIndex) return null
+            return column.showInForm ? renderFormItem(column) : null
           })}
           <FormProItem span="auto" flex="auto">
             <Space style={{ float: 'right' }}>
@@ -612,7 +610,7 @@ export default defineComponent({
           v-model={fullscreenState.value}
           fullscreenClass='table-pro--fullscreen'>
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            {renderSearchForm()}
+            {showSearchForm.value ? renderSearchForm() : null}
             {renderTable}
           </Space>
         </fullscreen>

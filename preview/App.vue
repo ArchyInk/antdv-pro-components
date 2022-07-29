@@ -2,14 +2,14 @@
  * @author: Archy
  * @Date: 2022-07-15 15:02:07
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-29 15:43:12
+ * @LastEditTime: 2022-07-29 16:16:08
  * @FilePath: \ant-design-vue-pro\preview\App.vue
  * @description: 
 -->
 <script setup lang="ts">
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import tablePro, { ColumnsProType } from '../components/tablePro/tablePro';
-import {columns} from './column'
+import { columns } from './column'
 import FormPro, { FormProInstance } from '../components/formPro/formPro'
 import FormProItem from '../components/formPro/formProItem'
 import { ConfigProvider } from 'ant-design-vue';
@@ -55,7 +55,13 @@ const onClick = () => {
 <template>
   <ConfigProvider :locale="zhCN">
     <!-- <a-button @click="onClick">test</a-button> -->
-    <tablePro :data="getData" :columns="columns" :cardBordered="false"></tablePro>
+    <tablePro :data="getData" :columns="columns" :cardBordered="false" :show-search-form="true">
+      <template #formItem="{ column, model }">
+        <template v-if="column.dataIndex === 'endTime'">
+          <a-input v-model:value="model.endTime">123</a-input>
+        </template>
+      </template>
+    </tablePro>
     <!-- <FormPro :model="model" :rules="rules" ref="formPro" :mode="mode" :disabled="disabled" :align="'middle'">
       <FormProItem label="输入框" name="one">
         <a-input v-model:value="model.one"></a-input>
