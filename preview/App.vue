@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-15 15:02:07
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-29 20:35:34
+ * @LastEditTime: 2022-07-29 22:56:06
  * @FilePath: \ant-design-vue-pro\preview\App.vue
  * @description: 
 -->
@@ -16,6 +16,7 @@ import 'ant-design-vue/es/button/style/index.css'
 import 'ant-design-vue/es/card/style/index.css'
 import { reactive, ref, toRaw } from 'vue'
 import { FormProInstance } from 'components/formPro/formPro';
+import ModalPro from '../components/modelPro/modelPro'
 
 const getData = (p: any) => {
   console.log(p);
@@ -42,7 +43,8 @@ const mode = ref<'edit' | 'view'>('edit')
 const from = ref()
 const input = ref()
 const onClick = () => {
-  disabled.value = !disabled.value
+  // disabled.value = !disabled.value
+  visible.value = !visible.value
   // mode.value = mode.value === 'view' ? 'edit' : 'view'
 }
 const onSubmit = () => {
@@ -53,11 +55,15 @@ const onSubmit = () => {
     console.log(err);
   })
 }
+
+const visible = ref(false)
+
 </script>
 
 <template>
   <ConfigProvider :locale="zhCN">
     <Button @click="onClick">test</Button>
+    <ModalPro v-model:visible="visible">123</ModalPro>
     <!-- <a-table-pro :data="getData" :columns="columns" :cardBordered="false" :show-search-form="true">
       <template #formItem="{ column, model }">
         <template v-if="column.dataIndex === 'endTime'">
@@ -65,7 +71,7 @@ const onSubmit = () => {
         </template>
       </template>
     </a-table-pro> -->
-    <Card>
+    <!-- <Card>
       <a-form-pro :model="model" :rules="rules" ref="formPro" :mode="mode" :disabled="disabled" :align="'middle'">
         <a-form-pro-item label="输入框" name="one">
           <Input v-model:value="model.one"></Input>
@@ -90,7 +96,7 @@ const onSubmit = () => {
           </div>
         </a-form-pro-item>
       </a-form-pro>
-    </Card>
+    </Card> -->
   </ConfigProvider>
 </template>
 
