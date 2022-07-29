@@ -1,27 +1,31 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "baseUrl": ".",
+    "target": "esnext",
     "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "esnext",
+    "moduleResolution": "node",
     "strict": true,
     "jsx": "preserve",
     "sourceMap": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "lib": ["esnext", "dom"],
+    "skipLibCheck": true,
+    "declarationDir": "types",
+    "paths": {
+      "vue-types": ["node_modules/vue-types"],
+      "scroll-into-view-if-needed": ["node_modules/ant-design-vue"]
+    }
   },
   "include": [
     "components/**/*.ts",
     "components/**/*.d.ts",
     "components/**/*.tsx",
-    "components/**/*.vue",
-    "preview/**/*.ts",
-    "preview/**/*.d.ts",
-    "preview/**/*.tsx",
-    "preview/**/*.vue"
+    "components/**/*.vue"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

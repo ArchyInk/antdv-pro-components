@@ -10,13 +10,14 @@ import {
   watch,
   computed,
   toRaw,
-  Ref
 } from 'vue'
+
 import {
   ColumnType,
   TablePaginationConfig,
   tableProps,
 } from 'ant-design-vue/es/table'
+
 import { cloneDeep, omit, snakeCase } from 'lodash'
 import {
   DefaultRecordType,
@@ -36,7 +37,6 @@ import {
   Input,
   Select,
   TimePicker,
-  TimeRangePicker
 } from 'ant-design-vue'
 import { FilterValue } from 'ant-design-vue/es/table/interface'
 import Draggable from 'vuedraggable'
@@ -129,7 +129,7 @@ export const tableProProps = () =>
     cardBordered: { type: Boolean, default: true },
 
     // 卡片内容自定义样式
-    cardBodyStyle: { type: Object }
+    cardBodyStyle: { type: Object as PropType<CSSProperties> }
   })
 
 export type TableProProps = Partial<
