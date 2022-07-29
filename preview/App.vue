@@ -2,18 +2,20 @@
  * @author: Archy
  * @Date: 2022-07-15 15:02:07
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-29 16:16:08
+ * @LastEditTime: 2022-07-29 20:35:34
  * @FilePath: \ant-design-vue-pro\preview\App.vue
  * @description: 
 -->
 <script setup lang="ts">
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
-import tablePro, { ColumnsProType } from '../components/tablePro/tablePro';
 import { columns } from './column'
-import FormPro, { FormProInstance } from '../components/formPro/formPro'
-import FormProItem from '../components/formPro/formProItem'
-import { ConfigProvider } from 'ant-design-vue';
+import { ConfigProvider, Input, Select, Button, Radio, Card } from 'ant-design-vue';
+import 'ant-design-vue/es/input/style/index.css'
+import 'ant-design-vue/es/select/style/index.css'
+import 'ant-design-vue/es/button/style/index.css'
+import 'ant-design-vue/es/card/style/index.css'
 import { reactive, ref, toRaw } from 'vue'
+import { FormProInstance } from 'components/formPro/formPro';
 
 const getData = (p: any) => {
   console.log(p);
@@ -40,12 +42,13 @@ const mode = ref<'edit' | 'view'>('edit')
 const from = ref()
 const input = ref()
 const onClick = () => {
-  // disabled.value = !disabled.value
+  disabled.value = !disabled.value
   // mode.value = mode.value === 'view' ? 'edit' : 'view'
-  // input.value.props.disabled = true
-  formPro.value!.resetFields()
+}
+const onSubmit = () => {
   formPro.value!.validate().then(() => {
     console.log(toRaw(model));
+    console.log('success');
   }).catch(err => {
     console.log(err);
   })
@@ -54,37 +57,40 @@ const onClick = () => {
 
 <template>
   <ConfigProvider :locale="zhCN">
-    <!-- <a-button @click="onClick">test</a-button> -->
-    <tablePro :data="getData" :columns="columns" :cardBordered="false" :show-search-form="true">
+    <Button @click="onClick">test</Button>
+    <!-- <a-table-pro :data="getData" :columns="columns" :cardBordered="false" :show-search-form="true">
       <template #formItem="{ column, model }">
         <template v-if="column.dataIndex === 'endTime'">
-          <a-input v-model:value="model.endTime">123</a-input>
+          <TimePicker v-model:value="model.endTime" :style="{width:'100%'}"></TimePicker>
         </template>
       </template>
-    </tablePro>
-    <!-- <FormPro :model="model" :rules="rules" ref="formPro" :mode="mode" :disabled="disabled" :align="'middle'">
-      <FormProItem label="输入框" name="one">
-        <a-input v-model:value="model.one"></a-input>
-      </FormProItem>
-      <FormProItem label="选择框" name="two">
-        <a-select v-model:value="model.two"></a-select>
-      </FormProItem>
-      <FormProItem label="单选框" name="true">
-        <a-radio v-model:checked="model.true"></a-radio>
-      </FormProItem>
-      <FormProItem :label="label" name="true">
-        <a-select></a-select>
-      </FormProItem>
-      <FormProItem label="多选框" span="auto" flex="auto">
-        <a-select :style="{ width: '100%' }"></a-select>
-      </FormProItem>
-      <FormProItem>
-        <div>
-          <a-button @click="onClick">确定</a-button>
-          <a-button>取消</a-button>
-        </div>
-      </FormProItem>
-    </FormPro> -->
+    </a-table-pro> -->
+    <Card>
+      <a-form-pro :model="model" :rules="rules" ref="formPro" :mode="mode" :disabled="disabled" :align="'middle'">
+        <a-form-pro-item label="输入框" name="one">
+          <Input v-model:value="model.one"></Input>
+        </a-form-pro-item>
+        <a-form-pro-item label="选择框" name="two">
+          <Select v-model:value="model.two"></Select>
+        </a-form-pro-item>
+        <a-form-pro-item label="单选框" name="true">
+          <Radio v-model:checked="model.true"></Radio>
+        </a-form-pro-item>
+        <a-form-pro-item :label="label" name="true">
+          <Input v-model:value="model.one"></Input>
+        </a-form-pro-item>
+        <a-form-pro-item label="多选框" span="auto" flex="auto">
+          <Input v-model:value="model.one"></Input>
+
+        </a-form-pro-item>
+        <a-form-pro-item>
+          <div>
+            <Button @click="onSubmit">确定</Button>
+            <Button @click="() => { formPro?.resetFields() }">取消</Button>
+          </div>
+        </a-form-pro-item>
+      </a-form-pro>
+    </Card>
   </ConfigProvider>
 </template>
 

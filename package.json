@@ -2,10 +2,10 @@
   "name": "ant-design-vue-pro",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc",
+    "compile": "npm run build & ink-cli compile",
     "preview": "vite preview"
   },
   "dependencies": {

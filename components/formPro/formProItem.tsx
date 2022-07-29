@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-28 09:58:15
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-29 10:37:24
+ * @LastEditTime: 2022-07-29 19:35:28
  * @FilePath: \ant-design-vue-pro\components\formPro\formProItem.tsx
  * @description:
  */
@@ -21,6 +21,7 @@ import { colProps } from 'ant-design-vue/es/grid/Col'
 import { formItemProps } from 'ant-design-vue/es/form/FormItem'
 import { omit, pick } from 'lodash'
 import { validateInfos } from 'ant-design-vue/es/form/useForm'
+import './style/index.less'
 
 export const formProItemProps = () =>
   Object.assign({}, omit(colProps(), 'span'), formItemProps(), {

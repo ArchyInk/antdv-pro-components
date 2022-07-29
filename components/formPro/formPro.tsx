@@ -31,9 +31,8 @@ import ResponsiveObserve, {
   ScreenMap,
 } from 'ant-design-vue/es/_util/responsiveObserve'
 import { DEFAULT_COLUMN_MAP } from '../shared/constant'
-import { chunk, omit, pick } from 'lodash'
+import {  omit, pick } from 'lodash'
 
-import './style/index.less'
 import {
   Props,
   ValidateInfo,

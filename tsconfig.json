@@ -25,7 +25,11 @@
     "components/**/*.ts",
     "components/**/*.d.ts",
     "components/**/*.tsx",
-    "components/**/*.vue"
-  ],
+    "components/**/*.vue",
+    "preview/**/*.ts",
+    "preview/**/*.d.ts",
+    "preview/**/*.tsx",
+    "preview/**/*.vue"
+, "components/modelPro/modelPro.tsx"  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

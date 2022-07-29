@@ -37,11 +37,11 @@ import {
   Input,
   Select,
   TimePicker,
+  DatePicker,
 } from 'ant-design-vue'
 import { FilterValue } from 'ant-design-vue/es/table/interface'
 import Draggable from 'vuedraggable'
 
-import './style/index.less'
 import {
   ColumnHeightOutlined,
   FullscreenOutlined,
@@ -52,6 +52,8 @@ import {
 import FormPro from '../formPro'
 import FormProItem from '../formPro/formProItem'
 import { FormProInstance } from '../formPro/formPro'
+
+import './style/index.less'
 
 export const tableProProps = () =>
   Object.assign({}, omit(tableProps(), 'columns'), {
@@ -136,7 +138,7 @@ export type TableProProps = Partial<
   ExtractPropTypes<ReturnType<typeof tableProProps>>
 >
 
-export type SearchFormItemType = 'select' | 'input' | 'timePicker' | 'timeRangePicker'
+export type SearchFormItemType = 'select' | 'input' | 'timePicker' | 'datePicker'
 
 export interface ColumnProType<RecordType = any>
   extends ColumnType<RecordType> {
@@ -525,6 +527,7 @@ export default defineComponent({
             case 'input': return <Input v-model:value={model[column.dataIndex as string]} placeholder="请输入"></Input>
             case 'select': return <Select v-model:value={model[column.dataIndex as string]} placeholder="请选择" options={typeof column.selectOptions === 'function' ? column.selectOptions?.() : column.selectOptions}></Select>
             case 'timePicker': return <TimePicker v-model:value={model[column.dataIndex as string]} style={{ width: '100%' }} placeholder="请选择时间" valueFormat={column.timeFormat}></TimePicker>
+            case 'datePicker': return <DatePicker v-model:value={model[column.dataIndex as string]} style={{ width: '100%' }} placeholder="请选择日期" valueFormat={column.timeFormat}></DatePicker>
             default: return column.customRenderFormItem?.(model) ?? slots.formItem?.({ column, model })
           }
         })()}</FormProItem>
