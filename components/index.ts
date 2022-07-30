@@ -2,12 +2,13 @@
  * @author: Archy
  * @Date: 2022-07-15 15:43:12
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-15 15:57:49
+ * @LastEditTime: 2022-07-30 11:46:59
  * @FilePath: \ant-design-vue-pro\components\index.ts
  * @description: 
  */
 import type { App } from 'vue'
 import * as Components from './components'
+export * from './components'
 
 export type Options = {
   prefix: string

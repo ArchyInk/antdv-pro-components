@@ -1,4 +1,5 @@
 import type { App } from 'vue';
+export * from './components';
 export declare type Options = {
     prefix: string;
 };
