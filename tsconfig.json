@@ -18,7 +18,7 @@
     "declarationDir": "types",
     "paths": {
       "vue-types": ["node_modules/vue-types"],
-      "scroll-into-view-if-needed": ["node_modules/ant-design-vue"]
+      "scroll-into-view-if-needed": ["node_modules/ant-design-vue"],
     }
   },
   "include": [
@@ -30,6 +30,6 @@
     "preview/**/*.d.ts",
     "preview/**/*.tsx",
     "preview/**/*.vue"
-, "components/modelPro/modelPro.tsx"  ],
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

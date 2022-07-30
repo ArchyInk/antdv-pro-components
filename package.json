@@ -1,6 +1,5 @@
 {
   "name": "ant-design-vue-pro",
-  "private": true,
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
@@ -8,6 +7,16 @@
     "compile": "npm run build & ink-cli compile",
     "preview": "vite preview"
   },
+  "main": "es/components/index.js",
+  "files": [
+    "lib",
+    "es",
+    "types"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "typings": "types",
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
     "ant-design-vue": "^3.2.10",

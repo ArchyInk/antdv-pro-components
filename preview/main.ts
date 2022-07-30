@@ -1,10 +1,10 @@
 /*
  * @author: Archy
- * @Date: 2022-07-15 15:02:07
+ * @Date: 2022-07-30 10:08:56
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-29 20:30:23
+ * @LastEditTime: 2022-07-30 10:38:41
  * @FilePath: \ant-design-vue-pro\preview\main.ts
- * @description:
+ * @description: 
  */
 import { createApp } from 'vue'
 import './style.css'
