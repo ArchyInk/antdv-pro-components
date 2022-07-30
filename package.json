@@ -5,7 +5,9 @@
     "dev": "vite",
     "build": "tsc",
     "compile": "npm run build & ink-cli compile",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "main": "es/components/index.js",
   "files": [

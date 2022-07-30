@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-07-15 15:02:07
  * @LastEditors: Archy
- * @LastEditTime: 2022-07-29 22:56:06
+ * @LastEditTime: 2022-07-30 14:01:21
  * @FilePath: \ant-design-vue-pro\preview\App.vue
  * @description: 
 -->
@@ -19,7 +19,6 @@ import { FormProInstance } from 'components/formPro/formPro';
 import ModalPro from '../components/modelPro/modelPro'
 
 const getData = (p: any) => {
-  console.log(p);
   return fetch(`http://rap2api.taobao.org/app/mock/294153/getTableData?pageSize=${p.pageSize}&pageNo=${p.pageNo}`).then(async res => {
     const ress = await res.json()
     return ress.obj

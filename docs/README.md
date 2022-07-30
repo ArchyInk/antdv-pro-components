@@ -9,10 +9,6 @@ actions:
     type: secondary
 ---
 
-## Antdv Pro Components
-
-基于Ant Design Vue 3.x封装的高级组件库
-
 ## 组件列表
 
 | 组件         | 描述                                                         | 源码                                                         |
